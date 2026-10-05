@@ -1,0 +1,4 @@
+region      = "us-east-1"
+name        = "demo"
+environment = "dev"
+# github_repo = "my-org/my-repo"
