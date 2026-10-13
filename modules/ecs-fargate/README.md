@@ -52,7 +52,7 @@ module "api" {
 }
 ```
 
-Secrets go in as env var name => ARN (Secrets Manager or SSM parameter). The execution role gets read access to exactly those ARNs. A Secrets Manager ARN with a JSON key suffix (`arn:...:secret:db-AbCdEf:password::`) works too. If a secret is encrypted with a customer managed KMS key, add a decrypt policy through `execution_role_policy_arns`.
+Secrets go in as env var name => ARN (Secrets Manager or SSM parameter). The execution role gets read access to exactly those ARNs. A Secrets Manager ARN with a JSON key suffix (`arn:...:secret:db-AbCdEf:password::`) works too. If a secret is encrypted with a customer managed KMS key, pass the key in `secrets_kms_key_arns` and the execution role gets `kms:Decrypt` on it.
 
 With `enable_execute_command = true` you can get a shell in a running task:
 
@@ -85,7 +85,9 @@ aws ecs execute-command --cluster api-prod --task <task-id> --container app --in
 | `wait_for_steady_state` | Wait for the service to reach a steady state on apply | `bool` | `false` | no |
 | `task_role_policy_arns` | Managed policies for the task role (the app's permissions), keyed by a static name | `map(string)` | `{}` | no |
 | `task_role_inline_policy` | Inline policy JSON for the task role | `string` | `null` | no |
-| `execution_role_policy_arns` | Extra managed policies for the execution role, e.g. KMS decrypt for secrets on a customer key | `map(string)` | `{}` | no |
+| `execution_role_policy_arns` | Extra managed policies for the execution role | `map(string)` | `{}` | no |
+| `secrets_kms_key_arns` | Customer-managed KMS keys the secrets are encrypted with, keyed by a static name. The execution role gets kms:Decrypt on them | `map(string)` | `{}` | no |
+| `log_kms_key_arn` | KMS key ARN for the log group. The key policy must allow CloudWatch Logs | `string` | `null` | no |
 | `log_retention_days` | CloudWatch Logs retention in days | `number` | `30` | no |
 | `tags` | Tags for all resources | `map(string)` | `{}` | no |
 

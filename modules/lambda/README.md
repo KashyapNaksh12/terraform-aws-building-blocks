@@ -46,11 +46,13 @@ module "worker" {
 | `timeout` | Timeout in seconds | `number` | `10` | no |
 | `reserved_concurrent_executions` | Reserved concurrency. -1 means unreserved | `number` | `-1` | no |
 | `environment_variables` | Environment variables for the function | `map(string)` | `{}` | no |
+| `kms_key_arn` | KMS key ARN for environment variables. Null uses the AWS-managed aws/lambda key. The role gets kms:Decrypt on it | `string` | `null` | no |
 | `subnet_ids` | Subnets for VPC-attached functions. Empty means no VPC | `list(string)` | `[]` | no |
 | `security_group_ids` | Security groups for VPC-attached functions | `list(string)` | `[]` | no |
 | `policy_arns` | Extra managed policy ARNs for the execution role, keyed by a static name | `map(string)` | `{}` | no |
 | `inline_policy` | Inline policy JSON to attach to the execution role | `string` | `null` | no |
 | `log_retention_days` | CloudWatch Logs retention in days | `number` | `30` | no |
+| `log_kms_key_arn` | KMS key ARN for the log group. The key policy must allow CloudWatch Logs | `string` | `null` | no |
 | `tracing_mode` | X-Ray tracing mode: PassThrough or Active. Null disables | `string` | `null` | no |
 | `tags` | Tags for all resources | `map(string)` | `{}` | no |
 

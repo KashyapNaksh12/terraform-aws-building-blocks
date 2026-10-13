@@ -181,6 +181,7 @@ resource "aws_cloudwatch_log_group" "flow_logs" {
 
   name              = "/aws/vpc/flow-logs/${var.name}"
   retention_in_days = var.flow_logs_retention_days
+  kms_key_id        = var.flow_logs_kms_key_arn
 
   tags = var.tags
 }

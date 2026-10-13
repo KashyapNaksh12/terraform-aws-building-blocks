@@ -42,6 +42,7 @@ module "vpc" {
 | `enable_s3_gateway_endpoint` | Add an S3 gateway endpoint (it's free) | `bool` | `true` | no |
 | `enable_flow_logs` | Send VPC flow logs to CloudWatch Logs | `bool` | `false` | no |
 | `flow_logs_retention_days` | Retention in days for the flow logs log group | `number` | `30` | no |
+| `flow_logs_kms_key_arn` | KMS key ARN for the flow logs log group. The key policy must allow CloudWatch Logs | `string` | `null` | no |
 | `flow_logs_traffic_type` | Traffic type to capture: ACCEPT, REJECT, or ALL | `string` | `"ALL"` | no |
 | `public_subnet_tags` | Extra tags for public subnets (e.g. kubernetes.io/role/elb = 1) | `map(string)` | `{}` | no |
 | `private_subnet_tags` | Extra tags for private subnets (e.g. kubernetes.io/role/internal-elb = 1) | `map(string)` | `{}` | no |

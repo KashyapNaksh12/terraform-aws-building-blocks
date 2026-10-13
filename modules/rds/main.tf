@@ -91,7 +91,8 @@ resource "aws_db_instance" "this" {
   port     = var.port
 
   # RDS generates the password and keeps it in Secrets Manager, so it stays out of state
-  manage_master_user_password = true
+  manage_master_user_password   = true
+  master_user_secret_kms_key_id = var.master_user_secret_kms_key_id
 
   db_subnet_group_name   = local.db_subnet_group_name
   vpc_security_group_ids = var.vpc_security_group_ids
@@ -111,6 +112,7 @@ resource "aws_db_instance" "this" {
   auto_minor_version_upgrade = var.auto_minor_version_upgrade
 
   performance_insights_enabled        = var.performance_insights_enabled
+  performance_insights_kms_key_id     = var.performance_insights_enabled ? try(coalesce(var.performance_insights_kms_key_id, var.kms_key_id), null) : null
   monitoring_interval                 = var.monitoring_interval
   monitoring_role_arn                 = try(aws_iam_role.monitoring[0].arn, null)
   enabled_cloudwatch_logs_exports     = var.enabled_cloudwatch_logs_exports

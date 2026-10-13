@@ -32,6 +32,7 @@ resource "aws_ecs_cluster" "this" {
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/ecs/${var.name}"
   retention_in_days = var.log_retention_days
+  kms_key_id        = var.log_kms_key_arn
 
   tags = var.tags
 }
@@ -90,6 +91,15 @@ data "aws_iam_policy_document" "secrets" {
     content {
       actions   = ["ssm:GetParameters"]
       resources = local.parameter_arns
+    }
+  }
+
+  dynamic "statement" {
+    for_each = length(var.secrets_kms_key_arns) > 0 ? [1] : []
+
+    content {
+      actions   = ["kms:Decrypt"]
+      resources = values(var.secrets_kms_key_arns)
     }
   }
 }

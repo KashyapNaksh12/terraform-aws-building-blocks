@@ -91,6 +91,12 @@ variable "flow_logs_retention_days" {
   default     = 30
 }
 
+variable "flow_logs_kms_key_arn" {
+  description = "KMS key ARN for the flow logs log group. The key policy must allow CloudWatch Logs"
+  type        = string
+  default     = null
+}
+
 variable "flow_logs_traffic_type" {
   description = "Traffic type to capture: ACCEPT, REJECT, or ALL"
   type        = string

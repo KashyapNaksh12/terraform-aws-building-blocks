@@ -41,6 +41,7 @@ module "db" {
 | `max_allocated_storage` | Upper limit for storage autoscaling in GiB. Set to 0 to disable autoscaling | `number` | `100` | no |
 | `storage_type` | Storage type: gp3, gp2, io1, io2 | `string` | `"gp3"` | no |
 | `kms_key_id` | KMS key ARN for storage encryption. Null uses the AWS-managed RDS key | `string` | `null` | no |
+| `master_user_secret_kms_key_id` | KMS key ARN for the master password secret. Null uses the AWS-managed aws/secretsmanager key | `string` | `null` | no |
 | `db_name` | Name of the initial database to create | `string` | `null` | no |
 | `username` | Master username | `string` | `"dbadmin"` | no |
 | `port` | Port to listen on. Null uses the engine default | `number` | `null` | no |
@@ -57,6 +58,7 @@ module "db" {
 | `apply_immediately` | Apply modifications immediately instead of in the maintenance window | `bool` | `false` | no |
 | `auto_minor_version_upgrade` | Automatically apply minor engine upgrades | `bool` | `true` | no |
 | `performance_insights_enabled` | Enable Performance Insights | `bool` | `false` | no |
+| `performance_insights_kms_key_id` | KMS key ARN for Performance Insights data. Null falls back to kms_key_id, then the AWS-managed key | `string` | `null` | no |
 | `monitoring_interval` | Enhanced Monitoring interval in seconds (0, 1, 5, 10, 15, 30, 60). 0 disables | `number` | `0` | no |
 | `enabled_cloudwatch_logs_exports` | Log types to export to CloudWatch (e.g. ["postgresql", "upgrade"]) | `list(string)` | `[]` | no |
 | `parameter_group_family` | Parameter group family, e.g. postgres16. Leave null to use the default group | `string` | `null` | no |

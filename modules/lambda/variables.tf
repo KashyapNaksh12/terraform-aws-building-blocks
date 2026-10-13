@@ -81,6 +81,12 @@ variable "environment_variables" {
   default     = {}
 }
 
+variable "kms_key_arn" {
+  description = "KMS key ARN for environment variables. Null uses the AWS-managed aws/lambda key. The role gets kms:Decrypt on it"
+  type        = string
+  default     = null
+}
+
 variable "subnet_ids" {
   description = "Subnets for VPC-attached functions. Empty means no VPC"
   type        = list(string)
@@ -109,6 +115,12 @@ variable "log_retention_days" {
   description = "CloudWatch Logs retention in days"
   type        = number
   default     = 30
+}
+
+variable "log_kms_key_arn" {
+  description = "KMS key ARN for the log group. The key policy must allow CloudWatch Logs"
+  type        = string
+  default     = null
 }
 
 variable "tracing_mode" {

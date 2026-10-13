@@ -45,6 +45,12 @@ variable "kms_key_id" {
   default     = null
 }
 
+variable "master_user_secret_kms_key_id" {
+  description = "KMS key ARN for the master password secret. Null uses the AWS-managed aws/secretsmanager key"
+  type        = string
+  default     = null
+}
+
 variable "db_name" {
   description = "Name of the initial database to create"
   type        = string
@@ -139,6 +145,12 @@ variable "performance_insights_enabled" {
   description = "Enable Performance Insights"
   type        = bool
   default     = false
+}
+
+variable "performance_insights_kms_key_id" {
+  description = "KMS key ARN for Performance Insights data. Null falls back to kms_key_id, then the AWS-managed key"
+  type        = string
+  default     = null
 }
 
 variable "monitoring_interval" {

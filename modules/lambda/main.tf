@@ -53,9 +53,27 @@ resource "aws_iam_role_policy" "this" {
   policy = var.inline_policy
 }
 
+data "aws_iam_policy_document" "kms" {
+  count = var.kms_key_arn != null ? 1 : 0
+
+  statement {
+    actions   = ["kms:Decrypt"]
+    resources = [var.kms_key_arn]
+  }
+}
+
+resource "aws_iam_role_policy" "kms" {
+  count = var.kms_key_arn != null ? 1 : 0
+
+  name   = "kms"
+  role   = aws_iam_role.this.id
+  policy = data.aws_iam_policy_document.kms[0].json
+}
+
 resource "aws_cloudwatch_log_group" "this" {
   name              = "/aws/lambda/${var.function_name}"
   retention_in_days = var.log_retention_days
+  kms_key_id        = var.log_kms_key_arn
 
   tags = var.tags
 }
@@ -78,6 +96,7 @@ resource "aws_lambda_function" "this" {
   source_code_hash = local.is_image ? null : local.zip_hash
   handler          = local.is_image ? null : var.handler
   runtime          = local.is_image ? null : var.runtime
+  kms_key_arn      = var.kms_key_arn
 
   dynamic "environment" {
     for_each = length(var.environment_variables) > 0 ? [1] : []
@@ -109,6 +128,7 @@ resource "aws_lambda_function" "this" {
   depends_on = [
     aws_cloudwatch_log_group.this,
     aws_iam_role_policy_attachment.this,
+    aws_iam_role_policy.kms,
   ]
 
   lifecycle {

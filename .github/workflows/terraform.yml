@@ -37,6 +37,8 @@ jobs:
           - modules/acm
           - modules/cloudfront
           - modules/ecs-fargate
+          - modules/kms
+          - modules/secrets-manager
           - examples/complete
           - examples/ecs-cloudfront
     steps:

@@ -17,6 +17,8 @@ Terraform modules we use for the usual AWS stuff. Each folder under `modules/` i
 | [acm](modules/acm) | DNS-validated ACM certificate, records created in Route 53 if you give it a zone |
 | [cloudfront](modules/cloudfront) | CloudFront in front of a private S3 bucket (OAC) or an ALB |
 | [ecs-fargate](modules/ecs-fargate) | Fargate service with task definition, roles, logs, SG and autoscaling |
+| [kms](modules/kms) | KMS key with rotation, alias and a key policy built from admin/user/service inputs |
+| [secrets-manager](modules/secrets-manager) | Secrets Manager secret with optional value, rotation, replicas and resource policy |
 
 Needs Terraform >= 1.5 and AWS provider >= 5.81 (works on 6.x).
 

@@ -129,9 +129,21 @@ variable "task_role_inline_policy" {
 }
 
 variable "execution_role_policy_arns" {
-  description = "Extra managed policies for the execution role, e.g. KMS decrypt for secrets on a customer key"
+  description = "Extra managed policies for the execution role"
   type        = map(string)
   default     = {}
+}
+
+variable "secrets_kms_key_arns" {
+  description = "Customer-managed KMS keys the secrets are encrypted with, keyed by a static name. The execution role gets kms:Decrypt on them"
+  type        = map(string)
+  default     = {}
+}
+
+variable "log_kms_key_arn" {
+  description = "KMS key ARN for the log group. The key policy must allow CloudWatch Logs"
+  type        = string
+  default     = null
 }
 
 variable "log_retention_days" {
