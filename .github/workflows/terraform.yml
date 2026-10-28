@@ -39,6 +39,12 @@ jobs:
           - modules/ecs-fargate
           - modules/kms
           - modules/secrets-manager
+          - modules/sqs
+          - modules/sns
+          - modules/route53
+          - modules/elasticache
+          - modules/efs
+          - modules/waf
           - examples/complete
           - examples/ecs-cloudfront
     steps:

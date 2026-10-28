@@ -19,6 +19,12 @@ Terraform modules we use for the usual AWS stuff. Each folder under `modules/` i
 | [ecs-fargate](modules/ecs-fargate) | Fargate service with task definition, roles, logs, SG and autoscaling |
 | [kms](modules/kms) | KMS key with rotation, alias and a key policy built from admin/user/service inputs |
 | [secrets-manager](modules/secrets-manager) | Secrets Manager secret with optional value, rotation, replicas and resource policy |
+| [sqs](modules/sqs) | SQS queue (standard or FIFO) with DLQ, encryption and SNS subscribe permissions |
+| [sns](modules/sns) | SNS topic with locked-down policy, service publishers and subscriptions |
+| [route53](modules/route53) | Public or private hosted zone, or records in an existing zone (alias, weighted, failover) |
+| [elasticache](modules/elasticache) | Valkey/Redis replication group, encrypted, failover when it has replicas, slow log to CloudWatch |
+| [efs](modules/efs) | Encrypted EFS with mount targets, access points, IA lifecycle and backups |
+| [waf](modules/waf) | WAFv2 web ACL with AWS managed rules, IP block list, rate limit and logging, for ALB or CloudFront |
 
 Needs Terraform >= 1.5 and AWS provider >= 5.81 (works on 6.x).
 
