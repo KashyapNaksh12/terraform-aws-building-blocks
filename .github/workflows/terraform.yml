@@ -45,6 +45,7 @@ jobs:
           - modules/elasticache
           - modules/efs
           - modules/waf
+          - modules/cloudwatch-alarms
           - examples/complete
           - examples/ecs-cloudfront
     steps:
