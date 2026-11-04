@@ -51,6 +51,7 @@ jobs:
           - modules/guardduty
           - modules/security-hub
           - modules/inspector
+          - modules/backup
           - examples/complete
           - examples/ecs-cloudfront
     steps:

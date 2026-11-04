@@ -31,6 +31,7 @@ Terraform modules we use for the usual AWS stuff. Each folder under `modules/` i
 | [guardduty](modules/guardduty) | GuardDuty with protection plans, findings export and alerts to SNS |
 | [security-hub](modules/security-hub) | Security Hub with FSBP and CIS standards, documented control exceptions, aggregation and alerts |
 | [inspector](modules/inspector) | Inspector vulnerability scanning for EC2, ECR and Lambda with alerts |
+| [backup](modules/backup) | AWS Backup vault, plan and tag-based selection, cross-region copies, vault lock, failure alerts |
 
 Needs Terraform >= 1.5 and AWS provider >= 5.81 (works on 6.x).
 
