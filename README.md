@@ -30,6 +30,7 @@ Terraform modules we use for the usual AWS stuff. Each folder under `modules/` i
 | [config](modules/config) | AWS Config recorder, delivery bucket and a set of SOC2-related managed rules |
 | [guardduty](modules/guardduty) | GuardDuty with protection plans, findings export and alerts to SNS |
 | [security-hub](modules/security-hub) | Security Hub with FSBP and CIS standards, documented control exceptions, aggregation and alerts |
+| [inspector](modules/inspector) | Inspector vulnerability scanning for EC2, ECR and Lambda with alerts |
 
 Needs Terraform >= 1.5 and AWS provider >= 5.81 (works on 6.x).
 

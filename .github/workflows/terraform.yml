@@ -50,6 +50,7 @@ jobs:
           - modules/config
           - modules/guardduty
           - modules/security-hub
+          - modules/inspector
           - examples/complete
           - examples/ecs-cloudfront
     steps:
