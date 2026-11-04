@@ -1,0 +1,10 @@
+region      = "us-east-1"
+name        = "demo"
+environment = "prod"
+# alert_email = "security@example.com"
+# security_contact = {
+#   name  = "Security Team"
+#   title = "Security"
+#   email = "security@example.com"
+#   phone = "+1-555-0100"
+# }

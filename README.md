@@ -72,6 +72,8 @@ Heads up, this costs money (NAT gateway, RDS, ALB). Destroy it when you're done.
 
 `examples/ecs-cloudfront` runs nginx on Fargate behind an ALB, with CloudFront in front. The ALB only accepts traffic from CloudFront. Set `domain_name` and `route53_zone_id` to get a certificate and DNS record for your own domain.
 
+`examples/soc2-baseline` sets up the account-level controls for a SOC2 audit: CloudTrail with security alarms, Config with rules, GuardDuty, Security Hub, Inspector, AWS Backup and the account baseline, all alerting to one encrypted SNS topic. See its [README](examples/soc2-baseline/README.md) for how it maps to the trust services criteria.
+
 ## Dev
 
 ```bash
