@@ -49,6 +49,7 @@ jobs:
           - modules/cloudtrail
           - modules/config
           - modules/guardduty
+          - modules/security-hub
           - examples/complete
           - examples/ecs-cloudfront
     steps:
