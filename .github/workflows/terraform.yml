@@ -48,6 +48,7 @@ jobs:
           - modules/cloudwatch-alarms
           - modules/cloudtrail
           - modules/config
+          - modules/guardduty
           - examples/complete
           - examples/ecs-cloudfront
     steps:
