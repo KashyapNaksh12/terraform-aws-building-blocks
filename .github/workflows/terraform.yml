@@ -52,6 +52,7 @@ jobs:
           - modules/security-hub
           - modules/inspector
           - modules/backup
+          - modules/account-baseline
           - examples/complete
           - examples/ecs-cloudfront
     steps:

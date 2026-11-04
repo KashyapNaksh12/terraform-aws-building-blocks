@@ -32,6 +32,7 @@ Terraform modules we use for the usual AWS stuff. Each folder under `modules/` i
 | [security-hub](modules/security-hub) | Security Hub with FSBP and CIS standards, documented control exceptions, aggregation and alerts |
 | [inspector](modules/inspector) | Inspector vulnerability scanning for EC2, ECR and Lambda with alerts |
 | [backup](modules/backup) | AWS Backup vault, plan and tag-based selection, cross-region copies, vault lock, failure alerts |
+| [account-baseline](modules/account-baseline) | Password policy, account S3 public access block, EBS encryption by default, Access Analyzer, contacts |
 
 Needs Terraform >= 1.5 and AWS provider >= 5.81 (works on 6.x).
 
