@@ -46,6 +46,7 @@ jobs:
           - modules/efs
           - modules/waf
           - modules/cloudwatch-alarms
+          - modules/cloudtrail
           - examples/complete
           - examples/ecs-cloudfront
     steps:

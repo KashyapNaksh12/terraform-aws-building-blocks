@@ -26,6 +26,7 @@ Terraform modules we use for the usual AWS stuff. Each folder under `modules/` i
 | [efs](modules/efs) | Encrypted EFS with mount targets, access points, IA lifecycle and backups |
 | [waf](modules/waf) | WAFv2 web ACL with AWS managed rules, IP block list, rate limit and logging, for ALB or CloudFront |
 | [cloudwatch-alarms](modules/cloudwatch-alarms) | Ready-made alarms for RDS, ALB, ECS, Lambda and SQS plus custom ones, sent to SNS |
+| [cloudtrail](modules/cloudtrail) | Multi-region trail with log validation, locked-down encrypted bucket, CloudWatch Logs and CIS security alarms |
 
 Needs Terraform >= 1.5 and AWS provider >= 5.81 (works on 6.x).
 
