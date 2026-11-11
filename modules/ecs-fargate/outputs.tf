@@ -30,17 +30,17 @@ output "security_group_id" {
 
 output "task_role_arn" {
   description = "ARN of the task role (the app's permissions)"
-  value       = aws_iam_role.task.arn
+  value       = module.roles.task_role_arn
 }
 
 output "task_role_name" {
   description = "Name of the task role"
-  value       = aws_iam_role.task.name
+  value       = module.roles.task_role_name
 }
 
 output "execution_role_arn" {
   description = "ARN of the task execution role"
-  value       = aws_iam_role.execution.arn
+  value       = module.roles.execution_role_arn
 }
 
 output "log_group_name" {

@@ -3,18 +3,7 @@ locals {
   cluster_arn    = local.create_cluster ? aws_ecs_cluster.this[0].arn : var.cluster_arn
   cluster_name   = element(split("/", local.cluster_arn), length(split("/", local.cluster_arn)) - 1)
   has_port       = var.container.port != null
-
-  # secrets manager ARNs can carry a json-key suffix (arn:...:secret:name:key::),
-  # IAM only matches the bare secret ARN
-  secret_arns = distinct([
-    for arn in values(var.container.secrets) : join(":", slice(split(":", arn), 0, 7))
-    if strcontains(arn, ":secretsmanager:")
-  ])
-  parameter_arns = distinct([for arn in values(var.container.secrets) : arn if strcontains(arn, ":ssm:")])
 }
-
-data "aws_partition" "current" {}
-data "aws_caller_identity" "current" {}
 
 resource "aws_ecs_cluster" "this" {
   count = local.create_cluster ? 1 : 0
@@ -37,123 +26,20 @@ resource "aws_cloudwatch_log_group" "this" {
   tags = var.tags
 }
 
-data "aws_iam_policy_document" "assume" {
-  statement {
-    actions = ["sts:AssumeRole"]
+module "roles" {
+  source = "../ecs-task-roles"
 
-    principals {
-      type        = "Service"
-      identifiers = ["ecs-tasks.amazonaws.com"]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
-  }
-}
-
-# execution role: used by the ECS agent to pull the image, write logs and
-# fetch secrets before the container starts
-resource "aws_iam_role" "execution" {
-  name_prefix        = "${substr(var.name, 0, 26)}-exec-"
-  assume_role_policy = data.aws_iam_policy_document.assume.json
+  name                       = var.name
+  secrets                    = var.container.secrets
+  secrets_kms_key_arns       = var.secrets_kms_key_arns
+  execution_role_policy_arns = var.execution_role_policy_arns
+  task_role_policy_arns      = var.task_role_policy_arns
+  task_role_inline_policy    = var.task_role_inline_policy
+  enable_execute_command     = var.enable_execute_command
 
   tags = var.tags
 }
 
-resource "aws_iam_role_policy_attachment" "execution" {
-  for_each = merge(
-    { ecs = "arn:${data.aws_partition.current.partition}:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy" },
-    var.execution_role_policy_arns,
-  )
-
-  role       = aws_iam_role.execution.name
-  policy_arn = each.value
-}
-
-data "aws_iam_policy_document" "secrets" {
-  count = length(var.container.secrets) > 0 ? 1 : 0
-
-  dynamic "statement" {
-    for_each = length(local.secret_arns) > 0 ? [1] : []
-
-    content {
-      actions   = ["secretsmanager:GetSecretValue"]
-      resources = local.secret_arns
-    }
-  }
-
-  dynamic "statement" {
-    for_each = length(local.parameter_arns) > 0 ? [1] : []
-
-    content {
-      actions   = ["ssm:GetParameters"]
-      resources = local.parameter_arns
-    }
-  }
-
-  dynamic "statement" {
-    for_each = length(var.secrets_kms_key_arns) > 0 ? [1] : []
-
-    content {
-      actions   = ["kms:Decrypt"]
-      resources = values(var.secrets_kms_key_arns)
-    }
-  }
-}
-
-resource "aws_iam_role_policy" "secrets" {
-  count = length(var.container.secrets) > 0 ? 1 : 0
-
-  name   = "secrets"
-  role   = aws_iam_role.execution.id
-  policy = data.aws_iam_policy_document.secrets[0].json
-}
-
-# task role: what the app itself can do
-resource "aws_iam_role" "task" {
-  name_prefix        = "${substr(var.name, 0, 26)}-task-"
-  assume_role_policy = data.aws_iam_policy_document.assume.json
-
-  tags = var.tags
-}
-
-resource "aws_iam_role_policy_attachment" "task" {
-  for_each = var.task_role_policy_arns
-
-  role       = aws_iam_role.task.name
-  policy_arn = each.value
-}
-
-resource "aws_iam_role_policy" "task" {
-  count = var.task_role_inline_policy != null ? 1 : 0
-
-  name   = "inline"
-  role   = aws_iam_role.task.id
-  policy = var.task_role_inline_policy
-}
-
-data "aws_iam_policy_document" "exec" {
-  statement {
-    actions = [
-      "ssmmessages:CreateControlChannel",
-      "ssmmessages:CreateDataChannel",
-      "ssmmessages:OpenControlChannel",
-      "ssmmessages:OpenDataChannel",
-    ]
-    resources = ["*"]
-  }
-}
-
-resource "aws_iam_role_policy" "exec" {
-  count = var.enable_execute_command ? 1 : 0
-
-  name   = "ecs-exec"
-  role   = aws_iam_role.task.id
-  policy = data.aws_iam_policy_document.exec.json
-}
 
 resource "aws_ecs_task_definition" "this" {
   family                   = var.name
@@ -161,8 +47,8 @@ resource "aws_ecs_task_definition" "this" {
   network_mode             = "awsvpc"
   cpu                      = var.cpu
   memory                   = var.memory
-  execution_role_arn       = aws_iam_role.execution.arn
-  task_role_arn            = aws_iam_role.task.arn
+  execution_role_arn       = module.roles.execution_role_arn
+  task_role_arn            = module.roles.task_role_arn
 
   runtime_platform {
     operating_system_family = "LINUX"
@@ -284,54 +170,17 @@ resource "aws_ecs_service" "this" {
   }
 }
 
-resource "aws_appautoscaling_target" "this" {
-  count = var.autoscaling != null ? 1 : 0
+module "autoscaling" {
+  count  = var.autoscaling != null ? 1 : 0
+  source = "../ecs-autoscaling"
 
-  service_namespace  = "ecs"
-  scalable_dimension = "ecs:service:DesiredCount"
-  resource_id        = "service/${local.cluster_name}/${aws_ecs_service.this.name}"
-  min_capacity       = var.autoscaling.min_capacity
-  max_capacity       = var.autoscaling.max_capacity
+  name          = var.name
+  cluster_name  = local.cluster_name
+  service_name  = aws_ecs_service.this.name
+  min_capacity  = var.autoscaling.min_capacity
+  max_capacity  = var.autoscaling.max_capacity
+  cpu_target    = var.autoscaling.cpu_target
+  memory_target = var.autoscaling.memory_target
 
   tags = var.tags
-}
-
-resource "aws_appautoscaling_policy" "cpu" {
-  count = var.autoscaling != null ? 1 : 0
-
-  name               = "${var.name}-cpu"
-  policy_type        = "TargetTrackingScaling"
-  service_namespace  = aws_appautoscaling_target.this[0].service_namespace
-  scalable_dimension = aws_appautoscaling_target.this[0].scalable_dimension
-  resource_id        = aws_appautoscaling_target.this[0].resource_id
-
-  target_tracking_scaling_policy_configuration {
-    target_value       = var.autoscaling.cpu_target
-    scale_in_cooldown  = 300
-    scale_out_cooldown = 60
-
-    predefined_metric_specification {
-      predefined_metric_type = "ECSServiceAverageCPUUtilization"
-    }
-  }
-}
-
-resource "aws_appautoscaling_policy" "memory" {
-  count = try(var.autoscaling.memory_target, null) != null ? 1 : 0
-
-  name               = "${var.name}-memory"
-  policy_type        = "TargetTrackingScaling"
-  service_namespace  = aws_appautoscaling_target.this[0].service_namespace
-  scalable_dimension = aws_appautoscaling_target.this[0].scalable_dimension
-  resource_id        = aws_appautoscaling_target.this[0].resource_id
-
-  target_tracking_scaling_policy_configuration {
-    target_value       = var.autoscaling.memory_target
-    scale_in_cooldown  = 300
-    scale_out_cooldown = 60
-
-    predefined_metric_specification {
-      predefined_metric_type = "ECSServiceAverageMemoryUtilization"
-    }
-  }
 }
