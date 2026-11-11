@@ -8,7 +8,7 @@ The service should ignore changes to `desired_count`, otherwise Terraform resets
 
 ```hcl
 module "autoscaling" {
-  source = "git::https://github.com/KashyapNaksh12/terraform-aws-building-blocks.git//modules/ecs-autoscaling?ref=v1.4.0"
+  source = "git::https://github.com/KashyapNaksh12/terraform-aws-building-blocks.git//modules/ecs-autoscaling?ref=v1.5.0"
 
   name          = "api"
   cluster_name  = "prod"

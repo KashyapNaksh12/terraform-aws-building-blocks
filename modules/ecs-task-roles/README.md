@@ -9,7 +9,7 @@ The two IAM roles an ECS task needs. Used by [ecs-fargate](../ecs-fargate), also
 
 ```hcl
 module "roles" {
-  source = "git::https://github.com/KashyapNaksh12/terraform-aws-building-blocks.git//modules/ecs-task-roles?ref=v1.4.0"
+  source = "git::https://github.com/KashyapNaksh12/terraform-aws-building-blocks.git//modules/ecs-task-roles?ref=v1.5.0"
 
   name = "api"
 

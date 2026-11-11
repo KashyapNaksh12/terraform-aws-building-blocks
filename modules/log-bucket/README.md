@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "writer" {
 }
 
 module "log_bucket" {
-  source = "git::https://github.com/KashyapNaksh12/terraform-aws-building-blocks.git//modules/log-bucket?ref=v1.4.0"
+  source = "git::https://github.com/KashyapNaksh12/terraform-aws-building-blocks.git//modules/log-bucket?ref=v1.5.0"
 
   bucket_name             = "my-logs"
   kms_key_arn             = module.kms.key_arn

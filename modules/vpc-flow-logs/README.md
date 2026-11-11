@@ -6,7 +6,7 @@ VPC flow logs to a CloudWatch log group, with the IAM role the flow log service 
 
 ```hcl
 module "flow_logs" {
-  source = "git::https://github.com/KashyapNaksh12/terraform-aws-building-blocks.git//modules/vpc-flow-logs?ref=v1.4.0"
+  source = "git::https://github.com/KashyapNaksh12/terraform-aws-building-blocks.git//modules/vpc-flow-logs?ref=v1.5.0"
 
   name           = "prod"
   vpc_id         = module.vpc.vpc_id
