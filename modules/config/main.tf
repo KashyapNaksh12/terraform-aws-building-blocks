@@ -12,91 +12,6 @@ locals {
 }
 
 
-resource "aws_s3_bucket" "this" {
-  count = local.create_bucket ? 1 : 0
-
-  bucket        = local.bucket_name
-  force_destroy = var.force_destroy
-
-  tags = var.tags
-}
-
-resource "aws_s3_bucket_ownership_controls" "this" {
-  count = local.create_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.this[0].id
-
-  rule {
-    object_ownership = "BucketOwnerEnforced"
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "this" {
-  count = local.create_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.this[0].id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_versioning" "this" {
-  count = local.create_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.this[0].id
-
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
-  count = local.create_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.this[0].id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm     = var.kms_key_arn != null ? "aws:kms" : "AES256"
-      kms_master_key_id = var.kms_key_arn
-    }
-    bucket_key_enabled = var.kms_key_arn != null
-  }
-}
-
-resource "aws_s3_bucket_lifecycle_configuration" "this" {
-  count = local.create_bucket ? 1 : 0
-
-  bucket = aws_s3_bucket.this[0].id
-
-  rule {
-    id     = "config-retention"
-    status = "Enabled"
-
-    filter {}
-
-    dynamic "expiration" {
-      for_each = var.log_retention_days != null ? [var.log_retention_days] : []
-
-      content {
-        days = expiration.value
-      }
-    }
-
-    noncurrent_version_expiration {
-      noncurrent_days = 30
-    }
-
-    abort_incomplete_multipart_upload {
-      days_after_initiation = 7
-    }
-  }
-
-  depends_on = [aws_s3_bucket_versioning.this]
-}
-
 data "aws_iam_policy_document" "bucket" {
   count = local.create_bucket ? 1 : 0
 
@@ -139,33 +54,22 @@ data "aws_iam_policy_document" "bucket" {
       values   = [local.account_id]
     }
   }
-
-  statement {
-    sid       = "DenyInsecureTransport"
-    effect    = "Deny"
-    actions   = ["s3:*"]
-    resources = [local.bucket_arn, "${local.bucket_arn}/*"]
-
-    principals {
-      type        = "*"
-      identifiers = ["*"]
-    }
-
-    condition {
-      test     = "Bool"
-      variable = "aws:SecureTransport"
-      values   = ["false"]
-    }
-  }
 }
 
-resource "aws_s3_bucket_policy" "this" {
-  count = local.create_bucket ? 1 : 0
+module "bucket" {
+  count  = local.create_bucket ? 1 : 0
+  source = "../log-bucket"
 
-  bucket = aws_s3_bucket.this[0].id
-  policy = data.aws_iam_policy_document.bucket[0].json
+  bucket_name   = local.bucket_name
+  force_destroy = var.force_destroy
+  kms_key_arn   = var.kms_key_arn
 
-  depends_on = [aws_s3_bucket_public_access_block.this]
+  lifecycle_rule_id = "config-retention"
+  retention_days    = var.log_retention_days
+
+  source_policy_documents = [data.aws_iam_policy_document.bucket[0].json]
+
+  tags = var.tags
 }
 
 
@@ -273,7 +177,7 @@ resource "aws_config_delivery_channel" "this" {
     delivery_frequency = var.snapshot_frequency
   }
 
-  depends_on = [aws_config_configuration_recorder.this, aws_s3_bucket_policy.this, aws_iam_role_policy.delivery]
+  depends_on = [aws_config_configuration_recorder.this, module.bucket, aws_iam_role_policy.delivery]
 }
 
 resource "aws_config_configuration_recorder_status" "this" {
