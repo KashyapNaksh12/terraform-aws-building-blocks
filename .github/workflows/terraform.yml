@@ -53,6 +53,10 @@ jobs:
           - modules/inspector
           - modules/backup
           - modules/account-baseline
+          - modules/log-bucket
+          - modules/ecs-task-roles
+          - modules/ecs-autoscaling
+          - modules/vpc-flow-logs
           - examples/complete
           - examples/ecs-cloudfront
           - examples/soc2-baseline

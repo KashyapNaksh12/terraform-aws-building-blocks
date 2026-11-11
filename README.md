@@ -1,6 +1,6 @@
 # terraform-aws-building-blocks
 
-Terraform modules we use for the usual AWS stuff. Each folder under `modules/` is standalone.
+Terraform modules we use for the usual AWS stuff. Each folder under `modules/` is standalone. A few (cloudtrail, config, ecs-fargate, vpc) are built from the smaller modules at the bottom of the table, which you can also use on their own.
 
 | Module | |
 |--------|---|
@@ -33,6 +33,10 @@ Terraform modules we use for the usual AWS stuff. Each folder under `modules/` i
 | [inspector](modules/inspector) | Inspector vulnerability scanning for EC2, ECR and Lambda with alerts |
 | [backup](modules/backup) | AWS Backup vault, plan and tag-based selection, cross-region copies, vault lock, failure alerts |
 | [account-baseline](modules/account-baseline) | Password policy, account S3 public access block, EBS encryption by default, Access Analyzer, contacts |
+| [log-bucket](modules/log-bucket) | Private versioned S3 bucket for logs with encryption, lifecycle, TLS-only policy and optional Object Lock. Used by cloudtrail and config |
+| [ecs-task-roles](modules/ecs-task-roles) | Execution and task IAM roles for an ECS task, with secrets access. Used by ecs-fargate |
+| [ecs-autoscaling](modules/ecs-autoscaling) | Target tracking autoscaling (CPU and memory) for an ECS service. Used by ecs-fargate |
+| [vpc-flow-logs](modules/vpc-flow-logs) | VPC flow logs to CloudWatch Logs with the IAM role. Used by vpc |
 
 Needs Terraform >= 1.5 and AWS provider >= 5.81 (works on 6.x).
 
